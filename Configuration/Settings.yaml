@@ -1,0 +1,15 @@
+Neos:
+  Flow:
+    http:
+      middlewares:
+        debugBar:
+          position: 'start 200'
+          middleware: 'Sandstorm\NeosDebugBar\Http\DebugBarMiddleware'
+    mvc:
+      routes:
+        'Sandstorm.NeosDebugBar':
+          position: 'start'
+
+Sandstorm:
+  NeosDebugBar:
+    enabled: true

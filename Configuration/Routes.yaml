@@ -1,0 +1,8 @@
+-
+  name: 'Debug Bar Test'
+  uriPattern: 'debugbar-test'
+  defaults:
+    '@package': 'Sandstorm.NeosDebugBar'
+    '@controller': 'Test'
+    '@action': 'index'
+    '@format': 'html'
