@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Sandstorm\NeosDebugBar\Http;
 
+use DebugBar\Bridge\DoctrineCollector;
 use DebugBar\StandardDebugBar;
 use DebugBar\Storage\FileStorage;
 use GuzzleHttp\Psr7\Response;
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\ObjectManagement\ObjectManagerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -46,6 +48,12 @@ class DebugBarMiddleware implements MiddlewareInterface
     private const STORAGE_RELATIVE_PATH = 'DebugBar/Storage/';
 
     /**
+     * @Flow\Inject
+     * @var ObjectManagerInterface
+     */
+    protected $objectManager;
+
+    /**
      * @Flow\InjectConfiguration(path="enabled")
      * @var bool
      */
@@ -77,11 +85,24 @@ class DebugBarMiddleware implements MiddlewareInterface
 
     /**
      * Creates a StandardDebugBar with file-based storage in Data/Temporary.
+     * If Doctrine ORM is configured, also adds a DoctrineCollector that logs
+     * all SQL queries executed during the request.
      */
     private function createDebugBar(): StandardDebugBar
     {
         $debugbar = new StandardDebugBar();
         $debugbar->setStorage(new FileStorage(FLOW_PATH_TEMPORARY . self::STORAGE_RELATIVE_PATH));
+
+        if ($this->objectManager->isRegistered(\Doctrine\ORM\EntityManagerInterface::class)) {
+            /** @var \Doctrine\ORM\EntityManagerInterface $entityManager */
+            $entityManager = $this->objectManager->get(\Doctrine\ORM\EntityManagerInterface::class);
+            try {
+                $debugbar->addCollector(new DoctrineCollector($entityManager->getConnection()));
+            } catch (\Throwable $e) {
+                // Silently skip if the Doctrine connection is not available
+            }
+        }
+
         return $debugbar;
     }
 
