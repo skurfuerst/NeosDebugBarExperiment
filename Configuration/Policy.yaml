@@ -1,0 +1,11 @@
+privilegeTargets:
+  'Neos\Flow\Security\Authorization\Privilege\Method\MethodPrivilege':
+    'Sandstorm.NeosDebugBar:TestController':
+      matcher: 'method(Sandstorm\NeosDebugBar\Controller\TestController->indexAction())'
+
+roles:
+  'Neos.Flow:Everybody':
+    privileges:
+      -
+        privilegeTarget: 'Sandstorm.NeosDebugBar:TestController'
+        permission: GRANT
