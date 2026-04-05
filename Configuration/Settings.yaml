@@ -9,6 +9,20 @@ Neos:
       routes:
         'Sandstorm.NeosDebugBar':
           position: 'start'
+    resource:
+      storages:
+        # Exposes php-debugbar's vendor assets (CSS/JS/fonts) for publishing.
+        # getPublicResourcePaths() returns the resources/ directory inside the
+        # php-debugbar library package, which Flow's FileSystemSymlinkTarget
+        # symlinks to Web/_Resources/Static/Packages/DebugBar/.
+        debugBarAssets:
+          storage: 'Sandstorm\NeosDebugBar\ResourceManagement\DebugBarAssetStorage'
+      collections:
+        # Ties the debugbar asset storage to Flow's standard static-files target.
+        # Run `./flow resource:publish` to create the symlink.
+        debugBar:
+          storage: 'debugBarAssets'
+          target: 'localWebDirectoryStaticResourcesTarget'
 
 Sandstorm:
   NeosDebugBar:
