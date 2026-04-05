@@ -1,4 +1,13 @@
 -
+  name: 'Debug Bar Open Handler'
+  uriPattern: 'debugbar/open-handler'
+  defaults:
+    '@package': 'Sandstorm.NeosDebugBar'
+    '@controller': 'OpenHandler'
+    '@action': 'handle'
+    '@format': 'json'
+
+-
   name: 'Debug Bar Test'
   uriPattern: 'debugbar-test'
   defaults:
