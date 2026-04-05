@@ -39,6 +39,31 @@ class Psr7HttpDriver implements HttpDriverInterface
         // No-op: output is handled via the PSR-7 response body.
     }
 
+    public function isSessionStarted(): bool
+    {
+        return false;
+    }
+
+    public function setSessionValue(string $name, $value): void
+    {
+        // No-op: sessions are not used in PSR-7 middleware context.
+    }
+
+    public function hasSessionValue(string $name): bool
+    {
+        return false;
+    }
+
+    public function getSessionValue(string $name): mixed
+    {
+        return null;
+    }
+
+    public function deleteSessionValue(string $name): void
+    {
+        // No-op.
+    }
+
     /**
      * Returns the headers collected by sendDataInHeaders() / setHeaders().
      *

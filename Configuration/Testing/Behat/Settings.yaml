@@ -1,0 +1,14 @@
+Neos:
+  Flow:
+    persistence:
+      backendOptions:
+        driver: 'pdo_mysql'
+        host: '127.0.0.1'
+        port: 13306
+        dbname: 'neos_testing_behat'
+        user: 'neos'
+        password: 'neos'
+
+Sandstorm:
+  NeosDebugBar:
+    enabled: true

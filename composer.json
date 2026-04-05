@@ -8,10 +8,17 @@
         "neos/flow": "^8.0 || ^9.0",
         "php-debugbar/php-debugbar": "^3"
     },
+    "require-dev": {
+        "neos/behat": "^9.0",
+        "behat/behat": "^3.13"
+    },
     "autoload": {
         "psr-4": {
             "Sandstorm\\NeosDebugBar\\": "Classes/"
         }
+    },
+    "scripts": {
+        "test:behavioral": "behat -c Tests/Behavior/behat.yml.dist"
     },
     "extra": {
         "neos": {

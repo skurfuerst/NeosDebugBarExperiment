@@ -34,8 +34,13 @@ class OpenHandlerController extends ActionController
 
         $openHandler = new OpenHandler($debugbar);
 
+        // Use query parameters from the HTTP request (works with both real
+        // and internal/testing requests, unlike $_GET which is only populated
+        // for real HTTP requests).
+        $queryParams = $this->request->getHttpRequest()->getQueryParams();
+
         // handle() with echo=false and sendHeader=false returns raw JSON string.
-        $json = $openHandler->handle($_GET, false, false);
+        $json = $openHandler->handle($queryParams, false, false);
 
         return new Response(200, ['Content-Type' => 'application/json'], $json);
     }
