@@ -81,6 +81,35 @@ Or for a full cache clear:
 rm -rf Data/Temporary/Development/
 ```
 
+## Running Behat Tests
+
+### Quick start (local)
+
+```bash
+bash scripts/run-tests-locally.sh
+```
+
+This script handles MariaDB startup, Neos distribution creation, package linking, database setup, and Behat execution.
+
+### Manual run (if distribution already exists)
+
+```bash
+cd /home/user/neos-test-instance
+FLOW_CONTEXT=Testing/Behat ./bin/behat -c Packages/Application/Sandstorm.NeosDebugBar/Tests/Behavior/behat.yml.dist --no-interaction -v
+```
+
+### After code changes, clear cached proxy classes
+
+```bash
+cd /home/user/neos-test-instance
+rm -rf Data/Temporary/Testing/SubContextBehat/Cache/Code/Flow_Object_Classes/Sandstorm_*
+FLOW_CONTEXT=Testing/Behat ./flow flow:cache:warmup
+```
+
+### CI
+
+Behat tests run automatically via GitHub Actions on push/PR to `main` (see `.github/workflows/tests.yml`).
+
 ## Architecture
 
 - **Package namespace**: `Sandstorm\NeosDebugBar`

@@ -1,0 +1,83 @@
+name: Behavioral Tests
+
+on:
+  push:
+    branches: ['main', '[0-9]+.[0-9]+']
+  pull_request:
+    branches: ['main', '[0-9]+.[0-9]+']
+
+jobs:
+  behat:
+    name: Behat (PHP ${{ matrix.php-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.2', '8.3']
+
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MYSQL_ROOT_PASSWORD: neos
+          MYSQL_DATABASE: neos_testing_behat
+          MYSQL_USER: neos
+          MYSQL_PASSWORD: neos
+        ports:
+          - "3306:3306"
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    env:
+      FLOW_CONTEXT: Testing/Behat
+
+    steps:
+      - name: Checkout package
+        uses: actions/checkout@v4
+        with:
+          path: package
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, xml, json, pdo_mysql, intl, tokenizer
+          tools: composer:v2
+
+      - name: Create Neos distribution
+        run: |
+          composer create-project --no-interaction --stability dev \
+            neos/neos-development-distribution:9.0.x-dev neos-dist
+
+      - name: Link debug bar package and install test dependencies
+        run: |
+          cd neos-dist
+          composer config repositories.debugbar path ${{ github.workspace }}/package
+          composer require --no-interaction sandstorm/neos-debug-bar:@dev
+          composer require --dev --no-interaction neos/behat:^9.0 behat/behat:^3.13
+
+      - name: Configure database for Testing/Behat
+        run: |
+          mkdir -p neos-dist/Configuration/Testing/Behat
+          printf 'Neos:\n  Flow:\n    persistence:\n      backendOptions:\n        driver: pdo_mysql\n        host: 127.0.0.1\n        port: 3306\n        dbname: neos_testing_behat\n        user: neos\n        password: neos\nSandstorm:\n  NeosDebugBar:\n    enabled: true\n' > neos-dist/Configuration/Testing/Behat/Settings.yaml
+
+      - name: Run doctrine migrations
+        run: |
+          cd neos-dist
+          FLOW_CONTEXT=Testing/Behat ./flow doctrine:migrate
+
+      - name: Warm up caches
+        run: |
+          cd neos-dist
+          FLOW_CONTEXT=Testing/Behat ./flow flow:cache:warmup
+
+      - name: Run Behat tests
+        run: |
+          cd neos-dist
+          FLOW_CONTEXT=Testing/Behat ./bin/behat \
+            -c Packages/Application/Sandstorm.NeosDebugBar/Tests/Behavior/behat.yml.dist \
+            --no-interaction -v
