@@ -30,8 +30,6 @@ Neos:
           systemLogger:
             debugbar:
               class: Sandstorm\NeosDebugBar\Log\FlowLogCollector
-              options:
-                severityThreshold: '%LOG_DEBUG%'
 
 Sandstorm:
   NeosDebugBar:

@@ -75,6 +75,14 @@ class DebugBarMiddleware implements MiddlewareInterface
         $debugbar = $this->createDebugBar();
         $response = $handler->handle($request);
 
+        // Add Flow log collector after the handler ran: the system logger
+        // initialises lazily on first use (inside controllers etc.), so
+        // getInstance() returns null if called before the handler.
+        $logCollector = FlowLogCollector::getInstance();
+        if ($logCollector !== null) {
+            $debugbar->addCollector($logCollector);
+        }
+
         $contentType = $response->getHeaderLine('Content-Type');
 
         if (str_contains($contentType, 'text/html')) {
@@ -102,11 +110,6 @@ class DebugBarMiddleware implements MiddlewareInterface
             } catch (\Throwable $e) {
                 // Silently skip if the Doctrine connection is not available
             }
-        }
-
-        $logCollector = FlowLogCollector::getInstance();
-        if ($logCollector !== null) {
-            $debugbar->addCollector($logCollector);
         }
 
         return $debugbar;
