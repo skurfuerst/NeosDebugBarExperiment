@@ -24,6 +24,13 @@ class TestController extends ActionController
             $entityManager->getConnection()->executeQuery('SELECT 1 as debugbar_test');
         }
 
+        if ($this->objectManager->isRegistered(\Neos\Fusion\Core\Cache\ContentCache::class)) {
+            /** @var \Neos\Fusion\Core\Cache\ContentCache $contentCache */
+            $contentCache = $this->objectManager->get(\Neos\Fusion\Core\Cache\ContentCache::class);
+            // Unique identifier guarantees a cache miss on every request
+            $contentCache->getCachedSegment(fn() => '', 'debugbar/test/path', ['id' => uniqid()]);
+        }
+
         return '<!DOCTYPE html><html><head><title>Debug Bar Test</title></head><body><h1>Debug Bar Test Page</h1><p>If the debug bar works, it should appear below.</p></body></html>';
     }
 }
