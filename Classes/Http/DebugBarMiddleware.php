@@ -14,6 +14,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Sandstorm\NeosDebugBar\Log\FlowLogCollector;
 
 /**
  * PSR-15 middleware that injects the php-debugbar into responses.
@@ -101,6 +102,11 @@ class DebugBarMiddleware implements MiddlewareInterface
             } catch (\Throwable $e) {
                 // Silently skip if the Doctrine connection is not available
             }
+        }
+
+        $logCollector = FlowLogCollector::getInstance();
+        if ($logCollector !== null) {
+            $debugbar->addCollector($logCollector);
         }
 
         return $debugbar;

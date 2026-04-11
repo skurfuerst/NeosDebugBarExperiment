@@ -24,6 +24,15 @@ Neos:
           storage: 'debugBarAssets'
           target: 'localWebDirectoryStaticResourcesTarget'
 
+    log:
+      psr3:
+        'Neos\Flow\Log\PsrLoggerFactory':
+          systemLogger:
+            debugbar:
+              class: Sandstorm\NeosDebugBar\Log\FlowLogCollector
+              options:
+                severityThreshold: '%LOG_DEBUG%'
+
 Sandstorm:
   NeosDebugBar:
     enabled: true
